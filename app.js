@@ -35,9 +35,9 @@ function test(taskArr) {
                 break;
         }
     }
-    // else {
-    //     console.log("error occured");
-    // }
+    else {
+        console.log("error occured");
+    }
 }
 
 function callTimeout(task, time) {
@@ -47,5 +47,7 @@ function callTimeout(task, time) {
 function callInterval(task, time) {
     setInterval(() => console.log(task), time);
 }
+
+console.log("hello from testBranch");
 
 test(process.argv);

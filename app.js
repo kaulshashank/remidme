@@ -1,5 +1,3 @@
-// node remindme.js to <title string> in/after <time duration> <time unit>
-// -----------------------------------------------------------------------
 function test(taskArr) {
     if(taskArr[2] == 'to' && (taskArr[4] == 'in' || taskArr[4] == 'after')) {
         let task =  taskArr[3];

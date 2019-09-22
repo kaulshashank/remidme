@@ -48,5 +48,4 @@ function callInterval(task, time) {
     setInterval(() => console.log(task), time);
 }
 
-console.log("Processing input..");
 test(process.argv);

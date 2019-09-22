@@ -48,6 +48,4 @@ function callInterval(task, time) {
     setInterval(() => console.log(task), time);
 }
 
-console.log("hello from testBranch");
-
 test(process.argv);

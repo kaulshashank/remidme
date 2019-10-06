@@ -9,6 +9,8 @@
  *  time (number): Duration after which to schedule the required task.
  *  type (interval | timeout): interval -> The task of this type needs to be scheduled repeatedly after the specified time interval
  *                             timeout -> The task of this type will be scheduled to execute once after the specified time interval
+ * 	isPurge (boolean): Flag that decides whether to remove all scheduled reminders. Defaults to false.
+ * 	deleteTask (string): Contains the task id to delete. Defaults to undefined.
  * }
  * 
  * The parser also validates user input incase something unexpected is entered. 
@@ -24,11 +26,18 @@ const HELP_MSG = `
 	
 	remindme to do <task name> in/after/every <duration> <duration unit>
 	remindme to <task name> in/after/every <duration> <duration unit>
-	remindme in <duration> <duration unit> to do <task name>
-	remindme every <duration> <duration unit> to do <task name>
+	remindme in/after/every <duration> <duration unit> to do <task name>
+	remindme in/after/every <duration> <duration unit> to <task name>
 
-	To view this message again, use the "--help" or "-h" option.
-`; // @todo: Improve this message with examples
+	remindme [OPTION]
+
+	Options:
+
+	"--help" or "-h": View this message again.
+	"--list" or "-l": List all pending and scheduled reminders along with their task ids.
+	"--delete <task id>": Removes a scheduled reminder.
+	"--purge": Removes all scheduled reminders.
+`; // @todo: Improve this message with examples.
 
 function getTimeInMS(argV, inOrAfterIndex) {
 	if (typeof inOrAfterIndex === 'undefined') return undefined;
@@ -105,7 +114,10 @@ function parse(argV) {
 			type = 'timeout';
 		}
 
-		const taskObj = { task, time, type };
+		let isPurge = false; // @todo: Implement
+		let deleteTask = undefined; // @todo: Implement
+
+		const taskObj = { task, time, type, isPurge, deleteTask };
 
 		return taskObj;
 	} catch (err) {

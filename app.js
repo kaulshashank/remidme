@@ -1,5 +1,9 @@
-const parser = require("./parse.js");
+const notifier = require('./notifier');
 
-const something = parser(process.argv);
+const notificationObject = {
+    task: 'Remind me what to do',
+    time: 5000,
+    type: 'timeout',
+}
 
-console.log(something);
+notifier(notificationObject);

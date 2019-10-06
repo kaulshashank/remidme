@@ -37,6 +37,10 @@ function getTimeInMS(argV, inOrAfterIndex) {
 	const time = Number(argV[inOrAfterIndex + 1]);
 	const timeUnit = argV[inOrAfterIndex + 2];
 
+	// NotANumber type validation. Should not proceed further if 
+	// the time field could not be parsed to a valid number by Number();
+	if (isNaN(time)) return undefined;
+
 	switch (timeUnit) {
 		case 'hours':
 		case 'hour':

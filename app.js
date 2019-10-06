@@ -1,5 +1,5 @@
-const parser = require("./parse.js");
+const parser = require("./parser.js");
 
-const something = parser(process.argv);
+const task = parser(process.argv);
 
-console.log(something);
+console.log(task);

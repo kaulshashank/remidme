@@ -5,19 +5,23 @@ const notify = (msg) => {
         if(!msg) {
             reject(new Error('No Notification Found!'));
         } else {
-            resolve(
-                notifier.notify(
-                    {
-                      title: 'Notification',
-                      message: msg,
-                      //icon: path.join(__dirname, 'coulson.jpg'), // Absolute path (doesn't work on balloons)
-                      sound: true, // Only Notification Center or Windows Toasters
-                      wait: true // Wait with callback, until user action is taken against notification, does not apply to Windows Toasters as they always wait
-                    },
-                    (err, response) => {
-                      // Response is response from notification
+            notifier.notify(
+                {
+                    title: 'Notification',
+                    message: msg,
+                    //icon: path.join(__dirname, 'coulson.jpg'), // Absolute path (doesn't work on balloons)
+                    sound: true, // Only Notification Center or Windows Toasters
+                    wait: true // Wait with callback, until user action is taken against notification, does not apply to Windows Toasters as they always wait
+                },
+                (err, response) => {
+                    // Response is response from notification
+                    if(err) {
+                        reject(new Error('No Notification Found!'));
                     }
-                )
+                    else {
+                        resolve(response);
+                    }
+                }
             );
         }
     })

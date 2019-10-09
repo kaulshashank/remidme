@@ -16,30 +16,47 @@ const notify = (msg) => {
                 (err, response) => {
                     // Response is response from notification
                     if(err) {
-                        reject(new Error('No Notification Found!'));
-                    }
-                    else {
+                        reject(err);
+                    } else {
                         resolve(response);
                     }
                 }
             );
         }
-    })
+    });
 }
 
 const decideType = (notificationObject) => {
-    if(notificationObject.type == "interval") {
-        setInterval(() => { 
-            notify(notificationObject.task) 
-        }, notificationObject.time);
-    } else if(notificationObject.type == "timeout")  {
-        const timeoutID = setTimeout(() => { 
-            notify(notificationObject.task) 
-        }, notificationObject.time);
-        console.log(timeoutID);
-    } else {
-        //do nothing
-    }    
+    return new Promise((resolve, reject) => {
+        if(!notificationObject) {
+            reject(new Error('No Notification Object Found!'))
+        } else {
+            if(notificationObject.type == "interval") {
+                setInterval(() => { 
+                    notify(notificationObject.task)
+                        .then((response) => {
+                            resolve(response);
+                        })
+                        .catch((err) => {
+                            reject(err);
+                        }); 
+                }, notificationObject.time);
+            } else if(notificationObject.type == "timeout")  {
+                //timeoutID will be used to clear notifications
+                const timeoutID = setTimeout(() => { 
+                    notify(notificationObject.task)
+                        .then((response) => {
+                            resolve(response);
+                        })
+                        .catch((err) => {
+                            reject(err);
+                        }); 
+                }, notificationObject.time);
+            } else {
+                reject(new Error('Notification Type undefined!'));
+            }   
+        }
+    });
 }
 
 module.exports = decideType;

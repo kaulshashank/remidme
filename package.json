@@ -1,14 +1,22 @@
 {
-  "name": "projects",
-  "version": "1.0.0",
+  "name": "remindme",
+  "version": "0.1.0",
   "description": "",
-  "main": "clitest.js",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha *.test.js --exit --colors"
   },
-  "author": "",
-  "license": "ISC",
+  "contributors": [
+    "Shashank Kaul <kaulshashank96@gmail.com><shashank@klenty.com>",
+    "Hrittik Bhattacharjee <impulsiv.rekt.mind@gmail.com>",
+    "Rishi Kabra <rishikabra132@gmail.com>"
+  ],
+  "license": "MIT",
   "dependencies": {
     "node-notifier": "^6.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.2.1"
   }
 }

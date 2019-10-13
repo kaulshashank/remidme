@@ -1,3 +1,7 @@
+/**
+ * RemindMe Notifier Module
+ * @description Issues notifications to operating systems.
+ */
 const notifier = require('node-notifier');
 
 const reminderStore = {};

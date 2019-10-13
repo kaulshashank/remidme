@@ -6,7 +6,7 @@ const SECOND = 1000; // in ms.
 const MINUTE = 60 * SECOND;
 const HOUR = 60 * MINUTE;
 
-describe('Parser tests', function () {
+describe('Parser', function () {
 	it("'to do' before duration with plural duration unit", function () {
 		const fakeArgV = [
 			"/path/to/node/binary",

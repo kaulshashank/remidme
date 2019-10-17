@@ -10,6 +10,6 @@ const userInput = parser(process.argv);
 
 // client.createReminder(userInput);
 
-// client.fetchReminders();
+//  client.fetchReminders();
 
 // client.deleteReminder(taskId);

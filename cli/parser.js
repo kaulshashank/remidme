@@ -71,9 +71,7 @@ function getTimeInMS(argV, inOrAfterIndex) {
 
 function parse(argV) {
 	try {
-		const helpIndex = argV.findIndex(function (val) {
-			return ((val === "--help") || (val === "-h"));
-		});
+		const helpIndex = argV.findIndex(val => (val === "--help" || val === "-h"));
 
 		if (helpIndex !== -1) {
 			console.log(HELP_MSG);
@@ -81,15 +79,11 @@ function parse(argV) {
 			return;
 		}
 
-		// Index for 'in' or 'after' keywords
-		const inOrAfterIndex = argV.findIndex(function (val) {
-			return (val === 'in' || val === 'after');
-		});
-
 		// Index for 'to' keyword
-		const toIndex = argV.findIndex(function (val) {
-			return (val === 'to');
-		})
+		const toIndex = argV.findIndex(val => (val === 'to'));
+
+		// Index for 'in' or 'after' keywords
+		const inOrAfterIndex = argV.findIndex(val => (val === 'in' || val === 'after'));
 
 		const time = getTimeInMS(argV, inOrAfterIndex);
 

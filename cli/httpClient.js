@@ -10,7 +10,15 @@ const axios = require("axios");
  * 	on resolution: returns an object containing the taskId
  * 	on rejection: returns the error that caused the rejection
  */
-const createReminder = function () { }
+const createReminder = userInput => { 
+	axios.post('/reminder', {
+		task: userInput.task,
+		time: userInput.time,
+		type: userInput.type
+	})
+	.then(res)
+	.catch(err)
+}
 
 /**
  *  Should fetch all reminders
@@ -20,7 +28,11 @@ const createReminder = function () { }
  * 	on resolution: returns an array containing objects of the form { id, task, type, duration}
  * 	on rejection: returns the error that caused the rejection
  */
-const fetchReminders = function () { }
+const fetchReminders = () => {
+	axios.get('/')
+	.then(res)
+	.catch(err)
+}
 
 /**
  *  Should delete a reminder

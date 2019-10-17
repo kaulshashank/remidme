@@ -8,8 +8,8 @@ const userInput = parser(process.argv);
  * should be called.
  */
 
-// client.createReminder(userInput);
+client.createReminder(userInput);
 
-//  client.fetchReminders();
+client.fetchReminders();
 
 // client.deleteReminder(taskId);

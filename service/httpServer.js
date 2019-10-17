@@ -1,5 +1,6 @@
 const http = require("http");
 const notifier = require("./notifier.js");
+var fs = require("fs");
 
 /**
  * RemindMe Notifications server
@@ -50,6 +51,45 @@ const notifier = require("./notifier.js");
  * 
  * ====================================================================
  */
-const run = function () { }
+
+const server = http.createServer(req, res => {
+	if(res) {
+		if(req.method === 'GET' && req.url === '/reminder') { 
+			// fetching all reminders
+			res.writeHead(200, {'Content-Type': 'application/json'});
+			res.write(JSON.stringify({id:'', task:'', type:'', duration:''})); 
+			res.end();
+		} else if(req.method === 'POST') {
+			// creating reminder
+			if(req.url === '/reminder' && req.method === 'POST') {
+				req.on('data', function(data) {
+					reqBody = data;
+					res.writeHead();
+					res.write(data);
+					res.end();
+				})
+			} 
+		} else {
+			// for incorrect request
+			res.writeHead(400, {'Content-Type': 'text/plain'});
+			res.write('client side error occured');
+			res.end();
+		}
+	} else if(!res) {
+		// for no response
+		res.writeHead(500, {'Content-Type': 'text/plain'});
+		res.write('server side error occured');
+		res.end();
+	} else {
+		// for some other error
+		res.writeHead(404, {'Content-Type': 'text/plain'});
+		res.write('404: not found');
+		res.end();
+	}
+})
+
+const host = 'localhost'
+const port = process.env.PORT || 3000;
+server.listen(port, host, () => console.log(`Server has started at ${host}/${ port }`));
 
 module.exports = run;

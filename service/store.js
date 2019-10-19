@@ -68,6 +68,36 @@ class JSONStore {
 			return allReminders;
 		}
 	}
+
+	/**
+	 * deleteFromStore
+	 * @description Deletes reminders from store.
+	 * @param {string | undefined} uid : UID entered by user
+	 * @returns undefined | error
+	 */
+	deleteFromStore(uid) {
+		return new Promise((resolve, reject) => {
+			if (typeof uid === "string") {
+				const currentStore = require(this.path);
+	
+				delete currentStore[uid];
+	
+				fs.writeFile(this.path, JSON.stringify(currentStore, null, 2), (err) => {
+					if (err) {
+						reject(err);
+					}
+					resolve();
+				});
+			} else {
+				fs.writeFile(this.path, JSON.stringify({}, null, 2), (err) => {
+					if (err) {
+						reject(err);
+					}
+					resolve();
+				});
+			}
+		});
+	}
 }
 
 module.exports = new JSONStore();

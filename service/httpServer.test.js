@@ -12,16 +12,22 @@ const MINUTE = 60 * SECOND;
 const HOUR = 60 * MINUTE;
 
 describe("HTTP Server", function () {
+	this.timeout(999999999);
+	let APP;
 	before("Start notifications server", function (done) {
 		server()
-			.then(() => done())
+			.then((app) => {
+				APP = app;
+				done();
+			})
 			.catch(done);
 	});
 
 	let TASK_ID;
 
 	it("Create a reminder (POST /reminder)", function (done) {
-		chai.post(`${BASE_URL}/reminder`)
+		chai.request(APP)
+			.post(`/reminder`)
 			.send({ task: "Drink water", type: "timeout", duration: MINUTE })
 			.then(function (res) {
 				expect(res).to.have.status(200);
@@ -33,17 +39,19 @@ describe("HTTP Server", function () {
 	});
 
 	it("Fetch all reminders (GET /reminder)", function (done) {
-		chai.get(`${BASE_URL}/reminder`)
+		chai.request(APP)
+			.get(`/reminder`)
 			.then(function (res) {
 				expect(res).to.have.status(200);
-				expect(res.body).to.have.property("reminders").to.be.an("array");
+				expect(res.body).to.have.property("reminders").to.be.an("object");
 				done();
 			})
 			.catch(done);
 	});
 
 	it("Delete a reminder (DELETE /reminder)", function (done) {
-		chai.delete(`${BASE_URL}/reminder`)
+		chai.request(APP)
+			.delete(`/reminder`)
 			.send({ taskId: TASK_ID })
 			.then(function (res) {
 				expect(res).to.have.status(200);

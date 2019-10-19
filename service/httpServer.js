@@ -1,15 +1,42 @@
 const http = require("http");
-const notifier = require("./notifier.js");
+
+const store = require("./store.js");
+
+const validateNotificationObject = (notificationObject) => {
+	if (typeof notificationObject === "undefined"
+		|| Object.keys(notificationObject).length === 0) {
+		return false;
+	}
+	if (notificationObject.type
+		&& typeof notificationObject.type !== "string") {
+		return false;
+	}
+	if (notificationObject.task
+		&& typeof notificationObject.task !== "string") {
+		return false;
+	}
+	if (notificationObject.duration
+		&& (typeof notificationObject.duration !== "number"
+			&& typeof notificationObject.duration !== "string")) {
+		return false;
+	}
+
+	return true;
+}
+
+const onError = (req, res) => (err) => {
+	console.log("[SERVER] An error occured");
+	console.log(err);
+	res.statusCode = 500;
+	res.end();
+}
 
 /**
- * RemindMe Notifications server
- * @description Starts an HTTP server on port 80.
  * 
- * Returns a Promise whose resolution value is the
- * httpServer object.
+ * @param {*} req HTTP request object
+ * @param {*} res HTTP response object
  * 
- * 
- * =========================== END POINTS =============================
+ *=========================== END POINTS =============================
  * 
  * GET /reminder
  * Response status codes
@@ -50,6 +77,110 @@ const notifier = require("./notifier.js");
  * 
  * ====================================================================
  */
-const run = function () { }
+const onRequest = (req, res) => {
+
+	req.on("error", onError(req, res));
+
+	const { method, url } = req;
+
+	if (url === "/reminder") {
+		if (method === "GET") {
+			try {
+				const response = { reminders: store.readFromStore() };
+				res.statusCode = 200;
+				res.setHeader('Content-Type', 'application/json');
+				res.write(JSON.stringify(response));
+				res.end();
+			} catch (err) {
+				res.statusCode = 500;
+				res.write(JSON.stringify(err));
+				res.end();
+			}
+		} else if (method === "POST") {
+			try {
+				let requestBody = [];
+				req
+					.on("error", console.log)
+					.on("data", chunk => {
+						requestBody.push(chunk);
+					})
+					.on("end", () => {
+						requestBody = JSON.parse(Buffer.concat(requestBody).toString());
+						if (validateNotificationObject(requestBody)) {
+							store.writeToStore(requestBody)
+								.then(taskId => {
+									res.setHeader('Content-Type', 'application/json');
+									res.statusCode = 200;
+									res.write(JSON.stringify({ taskId }));
+									res.end();
+								});
+						} else {
+							throw new Error("Invalid request");
+						}
+					})
+			} catch (err) {
+				res.statusCode = 500;
+				res.write(JSON.stringify(err));
+				res.end();
+			}
+		} else if (method === "DELETE") {
+			try {
+				let requestBody = [];
+				req
+					.on("error", console.log)
+					.on("data", chunk => {
+						requestBody.push(chunk);
+					})
+					.on("end", () => {
+						requestBody = JSON.parse(Buffer.concat(requestBody).toString());
+						if (requestBody.taskId && typeof requestBody.taskId === "string") {
+							store.deleteFromStore(requestBody.taskId)
+								.then(() => {
+									res.setHeader("Content-Type", "application/json");
+									res.statusCode = 200;
+									res.end();
+								});
+						} else {
+							throw new Error("Invalid request");
+						}
+					})
+			} catch (err) {
+				res.statusCode = 500;
+				res.write(JSON.stringify(err));
+				res.end();
+			}
+		}
+	} else {
+		res.statusCode = 404;
+		res.setHeader("Content-Type", "application/json");
+		res.write(JSON.stringify({ "message": "Not Found." }));
+		res.end();
+	}
+}
+
+/**
+ * RemindMe Notifications server
+ * @description Starts an HTTP server on port 80.
+ * 
+ * Returns a Promise whose resolution value is the
+ * httpServer object.
+ * 
+ * 
+ */
+const run = () => {
+	return new Promise((resolve, reject) => {
+		try {
+			const server = http.createServer();
+
+			server.on("request", onRequest);
+
+			server.listen(process.env.PORT || 3000, () => {
+				resolve(server);
+			});
+		} catch (err) {
+			reject(err);
+		}
+	})
+}
 
 module.exports = run;

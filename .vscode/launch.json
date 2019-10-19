@@ -28,7 +28,8 @@
             "name": "(Linux) Run unit tests",
             "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
             "env": {
-                "REMINDME_STORE_LOC": "/home/shashankkaul/remindme_store.json"
+                "REMINDME_STORE_LOC": "/home/shashankkaul/test.json",
+                "PORT": "3030"
             },
             "args": [
                 "**/*.test.js",

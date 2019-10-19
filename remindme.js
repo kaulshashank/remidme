@@ -16,6 +16,7 @@ if (userInput && Object.keys(userInput).length) {
 		} else {
 			console.log("Oops! Something unexpected unexpected happened!")
 		}
+		process.exit(1);
 	}
 
 	if (userInput.isList) {

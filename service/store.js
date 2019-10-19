@@ -18,11 +18,11 @@ class JSONStore {
 	 */
 	generateUID() {
 		return "RME-"
-			+ String(Math.floor(Math.random() * 1000) + 2000) // Between 1000-2000
+			+ String(Math.floor(Math.random() * 1000) + 1000) // Between 1000-2000
 			+ "-"
-			+ String(Math.floor(Math.random() * 2000) + 3000)
+			+ String(Math.floor(Math.random() * 1000) + 2000) // Between 2000-3000
 			+ "-"
-			+ String(Math.floor(Math.random() * 3000) + 4000);
+			+ String(Math.floor(Math.random() * 1000) + 3000); // and so on...
 	}
 
 	/**
@@ -79,9 +79,9 @@ class JSONStore {
 		return new Promise((resolve, reject) => {
 			if (typeof uid === "string") {
 				const currentStore = require(this.path);
-	
+
 				delete currentStore[uid];
-	
+
 				fs.writeFile(this.path, JSON.stringify(currentStore, null, 2), (err) => {
 					if (err) {
 						reject(err);

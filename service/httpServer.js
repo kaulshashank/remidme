@@ -15,9 +15,9 @@ const validateNotificationObject = (notificationObject) => {
 		&& typeof notificationObject.task !== "string") {
 		return false;
 	}
-	if (notificationObject.duration
-		&& (typeof notificationObject.duration !== "number"
-			&& typeof notificationObject.duration !== "string")) {
+	if (notificationObject.time
+		&& (typeof notificationObject.time !== "number"
+			&& typeof notificationObject.time !== "string")) {
 		return false;
 	}
 

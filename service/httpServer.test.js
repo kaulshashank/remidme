@@ -6,13 +6,10 @@ chai.use(chaiHttp);
 
 const server = require("./httpServer.js");
 
-const BASE_URL = "http://localhost:80";
 const SECOND = 1000; // in ms.
 const MINUTE = 60 * SECOND;
-const HOUR = 60 * MINUTE;
 
 describe("HTTP Server", function () {
-	this.timeout(999999999);
 	let APP;
 	before("Start notifications server", function (done) {
 		server()

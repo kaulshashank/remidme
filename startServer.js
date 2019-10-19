@@ -1,13 +1,13 @@
 const server = require("./service/httpServer.js");
-
+const cron = require("./service/cron.js");
 /**
- * Should start the notifications server
+ * Start the notifications service.
  */
-server()
+Promise.all([server(), cron()])
 	.then(function () {
-		console.log("[service] RemindMe notifications server started.");
+		console.log("[service] RemindMe notifications service started.");
 	})
 	.catch(function (err) {
-		console.error("[service] An error occured before the server could be started.");
+		console.error("[service] An error occured before the service could be started.");
 		console.error(err);
 	});

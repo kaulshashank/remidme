@@ -36,7 +36,7 @@ const onError = (req, res) => (err) => {
  * @param {*} req HTTP request object
  * @param {*} res HTTP response object
  * 
- *=========================== END POINTS =============================
+ * =========================== END POINTS =============================
  * 
  * GET /reminder
  * Response status codes
@@ -44,7 +44,7 @@ const onError = (req, res) => (err) => {
  * 		If incorrect request from client: 400
  * 		If an error occured on the server: 500
  * Response body 
- * 		If succesful: should contain a JSON object of the form, { "reminders" : [ {id, task, type, duration}, ... ] }
+ * 		If succesful: should return the store
  * 		If inccorect request from the client: { message: "Incorrect input" }
  * 		If an error occured on the server: { error: <Error object> }
  * 
@@ -83,75 +83,91 @@ const onRequest = (req, res) => {
 
 	const { method, url } = req;
 
-	if (url === "/reminder") {
-		if (method === "GET") {
-			try {
-				const response = { reminders: store.readFromStore() };
-				res.statusCode = 200;
-				res.setHeader('Content-Type', 'application/json');
-				res.write(JSON.stringify(response));
-				res.end();
-			} catch (err) {
-				res.statusCode = 500;
-				res.write(JSON.stringify(err));
-				res.end();
-			}
-		} else if (method === "POST") {
-			try {
-				let requestBody = [];
-				req
-					.on("data", chunk => {
-						requestBody.push(chunk);
-					})
-					.on("end", () => {
-						requestBody = JSON.parse(Buffer.concat(requestBody).toString());
-						if (validateNotificationObject(requestBody)) {
-							store.writeToStore(requestBody)
-								.then(taskId => {
-									res.setHeader('Content-Type', 'application/json');
-									res.statusCode = 200;
-									res.write(JSON.stringify({ taskId }));
+	try {
+		if (url === "/reminder") {
+			if (method === "GET") {
+				try {
+					const response = { reminders: store.readFromStore() };
+					res.statusCode = 200;
+					res.setHeader('Content-Type', 'application/json');
+					res.write(JSON.stringify(response));
+					res.end();
+				} catch (err) {
+					res.statusCode = 500;
+					res.write(`Internal Server Error: ${err}`);
+					res.end();
+				}
+			} else if (method === "POST") {
+				try {
+					let requestBody = [];
+					req
+						.on("data", chunk => {
+							requestBody.push(chunk);
+						})
+						.on("end", () => {
+							try {
+								requestBody = JSON.parse(Buffer.concat(requestBody).toString());
+								if (validateNotificationObject(requestBody)) {
+									store.writeToStore(requestBody)
+										.then(taskId => {
+											res.setHeader('Content-Type', 'application/json');
+											res.statusCode = 200;
+											res.write(JSON.stringify({ taskId }));
+											res.end();
+										});
+								} else {
+									res.statusCode = 400;
+									res.write("Invalid Request");
 									res.end();
-								});
-						} else {
-							throw new Error("Invalid request");
-						}
-					})
-			} catch (err) {
-				res.statusCode = 500;
-				res.write(JSON.stringify(err));
-				res.end();
+								}
+							} catch (err) {
+								res.statusCode = 500;
+								res.write(`Internal Server Error: ${err}`);
+								res.end();
+							}
+						});
+				} catch (err) {
+					res.statusCode = 500;
+					res.write(`Internal Server Error: ${err}`);
+					res.end();
+				}
+			} else if (method === "DELETE") {
+				try {
+					let requestBody = [];
+					req
+						.on("data", chunk => {
+							requestBody.push(chunk);
+						})
+						.on("end", () => {
+							requestBody = JSON.parse(Buffer.concat(requestBody).toString());
+							if (requestBody.taskId && typeof requestBody.taskId === "string") {
+								store.deleteFromStore(requestBody.taskId)
+									.then(() => {
+										res.setHeader("Content-Type", "application/json");
+										res.statusCode = 200;
+										res.end();
+									});
+							} else {
+								res.statusCode = 400;
+								res.write("Invalid Request");
+								res.end();
+							}
+						})
+				} catch (err) {
+					res.statusCode = 500;
+					res.write(`Internal Server Error: ${err}`);
+					res.end();
+				}
 			}
-		} else if (method === "DELETE") {
-			try {
-				let requestBody = [];
-				req
-					.on("data", chunk => {
-						requestBody.push(chunk);
-					})
-					.on("end", () => {
-						requestBody = JSON.parse(Buffer.concat(requestBody).toString());
-						if (requestBody.taskId && typeof requestBody.taskId === "string") {
-							store.deleteFromStore(requestBody.taskId)
-								.then(() => {
-									res.setHeader("Content-Type", "application/json");
-									res.statusCode = 200;
-									res.end();
-								});
-						} else {
-							throw new Error("Invalid request");
-						}
-					})
-			} catch (err) {
-				res.statusCode = 500;
-				res.write(JSON.stringify(err));
-				res.end();
-			}
+		} else {
+			res.statusCode = 404;
+			res.setHeader("Content-Type", "application/json");
+			res.write(JSON.stringify({ "message": "Not Found." }));
+			res.end();
 		}
-	} else {
-		res.statusCode = 404;
-		res.setHeader("Content-Type", "application/json");
-		res.write(JSON.stringify({ "message": "Not Found." }));
+	} catch (err) {
+		res.statusCode = 500;
+		res.write(`Internal Server Error: ${err}`);
 		res.end();
 	}
 }
@@ -162,8 +178,6 @@ const onRequest = (req, res) => {
  * 
  * Returns a Promise whose resolution value is the
  * httpServer object.
- * 
- * 
  */
 const run = () => {
 	return new Promise((resolve, reject) => {

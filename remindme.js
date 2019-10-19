@@ -9,6 +9,15 @@ const userInput = parser(process.argv);
  * should be called.
  */
 if (userInput && Object.keys(userInput).length) {
+
+	function catchHandler(err) {
+		if (err.code === "ECONNREFUSED") {
+			console.log("Uh Oh! The remindme service is not running.")
+		} else {
+			console.log("Oops! Something unexpected unexpected happened!")
+		}
+	}
+
 	if (userInput.isList) {
 
 		return client.fetchReminders()
@@ -31,10 +40,7 @@ if (userInput && Object.keys(userInput).length) {
 					return;
 				}
 			})
-			.catch(function (err) {
-				console.log(err);
-				console.log("Uh oh! Something unexpected happened.");
-			})
+			.catch(catchHandler);
 	}
 
 	if (userInput.isPurge) {
@@ -42,14 +48,13 @@ if (userInput && Object.keys(userInput).length) {
 	}
 
 	if (userInput.deleteTask) {
-		return; // @todo
+		return client.deleteReminder(userInput.deleteTask)
+			.catch(catchHandler);
 	}
 
 	return client.createReminder(userInput)
 		.then(console.log)
-		.catch(function (err) {
-			console.log("Uh oh! Something unexpected happened.");
-		});
+		.catch(catchHandler);
 
 } else {
 	process.exit(1);

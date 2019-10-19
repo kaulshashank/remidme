@@ -13,7 +13,7 @@ function run() {
 		switch (reminder.type) {
 			case "timeout": {
 				if (new Date(reminder.time).valueOf() <= new Date().valueOf()) {
-					notify(reminder)
+					return notify(reminder)
 						.then(() => {
 							return store.deleteFromStore(uid);
 						});
@@ -29,6 +29,7 @@ function run() {
 						}
 					});
 					cron.start();
+					return;
 				}
 			}
 		}
@@ -42,6 +43,6 @@ const CRON_CONFIGURATIONS = {
 };
 
 module.exports = async function () {
-	const cron = new CronJob(CRON_CONFIGURATIONS);
-	cron.start();
+	// const cron = new CronJob(CRON_CONFIGURATIONS);
+	// cron.start();
 }

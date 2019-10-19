@@ -32,12 +32,8 @@
             "name": "(Linux) remindme",
             "program": "${workspaceFolder}/remindme.js",
             "args": [
-                "to",
-                "do",
-                "something",
-                "every",
-                "2",
-                "hours"
+                "--delete",
+                "RME-1430-2564-3578"
             ],
             "env": {
                 "REMINDME_STORE_LOC": "/home/shashankkaul/remindme_store.json",

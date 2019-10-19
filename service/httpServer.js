@@ -2,6 +2,8 @@ const http = require("http");
 
 const store = require("./store.js");
 
+const { isUID } = require("../cli/parser.js");
+
 const validateNotificationObject = (notificationObject) => {
 	if (typeof notificationObject === "undefined"
 		|| Object.keys(notificationObject).length === 0) {
@@ -84,7 +86,7 @@ const onRequest = (req, res) => {
 	const { method, url } = req;
 
 	try {
-		if (url === "/reminder") {
+		if (url.includes("/reminder")) {
 			if (method === "GET") {
 				try {
 					const response = { reminders: store.readFromStore() };
@@ -133,26 +135,20 @@ const onRequest = (req, res) => {
 				}
 			} else if (method === "DELETE") {
 				try {
-					let requestBody = [];
-					req
-						.on("data", chunk => {
-							requestBody.push(chunk);
-						})
-						.on("end", () => {
-							requestBody = JSON.parse(Buffer.concat(requestBody).toString());
-							if (requestBody.taskId && typeof requestBody.taskId === "string") {
-								store.deleteFromStore(requestBody.taskId)
-									.then(() => {
-										res.setHeader("Content-Type", "application/json");
-										res.statusCode = 200;
-										res.end();
-									});
-							} else {
-								res.statusCode = 400;
-								res.write("Invalid Request");
+					const query = url.split("?")[1];
+					const taskId = query.split("=")[1];
+					if (isUID(taskId)) {
+						store.deleteFromStore(taskId)
+							.then(() => {
+								res.setHeader("Content-Type", "application/json");
+								res.statusCode = 200;
 								res.end();
-							}
-						})
+							});
+					} else {
+						res.statusCode = 400;
+						res.write("Invalid Request");
+						res.end();
+					}
 				} catch (err) {
 					res.statusCode = 500;
 					res.write(`Internal Server Error: ${err}`);

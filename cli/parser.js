@@ -40,6 +40,8 @@ const HELP_MSG = `
 `; // @todo: Improve this message with examples.
 
 function isUID(uid) {
+	if (typeof uid !== "string") return false;
+
 	const segments = uid.split("-");
 	return (
 		segments.length === 4

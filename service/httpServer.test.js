@@ -48,8 +48,7 @@ describe("HTTP Server", function () {
 
 	it("Delete a reminder (DELETE /reminder)", function (done) {
 		chai.request(APP)
-			.delete(`/reminder`)
-			.send({ taskId: TASK_ID })
+			.delete(`/reminder?id=${TASK_ID}`)
 			.then(function (res) {
 				expect(res).to.have.status(200);
 				done();

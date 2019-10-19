@@ -29,14 +29,17 @@ if (userInput && Object.keys(userInput).length) {
 					]
 
 					for (let i = 0; i < uids.length; ++i) {
-						list[i + 1] = [uids[i], reminders[uids[i]].task, new Date(reminders[uids[i]].time).toString()];
+						if(reminders[uids[i]].type === "timeout") 
+							list[i + 1] = [uids[i], reminders[uids[i]].task, new Date(reminders[uids[i]].time).toString()];
+						else
+							list[i + 1] = [uids[i], reminders[uids[i]].task, reminders[uids[i]].time];
 					}
 
 					console.log(table(list));
 					return;
 				} else {
 					console.log("Sorry, you haven't created any reminders :(");
-					console.log("Run 'remindme --help' for usage.");
+					console.log("'remindme --help' for usage.");
 					return;
 				}
 			})

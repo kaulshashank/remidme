@@ -98,6 +98,26 @@ class JSONStore {
 			}
 		});
 	}
+
+	/**
+	 * issueForDelete
+	 * @description Schedules a running job for deletion.
+	 * @param {string | undefined} uid : UID of interval task
+	 */
+	issueForDelete(uid) {
+		return new Promise((resolve, reject) => {
+			
+			const currentStore = require(this.path);
+			currentStore[uid].issuedForDelete = true;
+
+			fs.writeFile(this.path, JSON.stringify(currentStore, null, 2), (err) => {
+				if (err) {
+					reject(err);
+				}
+				resolve();
+			});
+		});
+	}
 }
 
 module.exports = new JSONStore();

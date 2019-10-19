@@ -81,13 +81,16 @@ const onError = (req, res) => (err) => {
  */
 const onRequest = (req, res) => {
 
-	req.on("error", onError(req, res));
+	req.on("error", onError(req, res)); // Curry 'cuz I can ¯\_(ツ)_/¯
 
 	const { method, url } = req;
 
 	try {
-		if (url.includes("/reminder")) {
+		if (url.includes("/reminder")) { // Using include as url might include query string
 			if (method === "GET") {
+				/**
+			 	 * Return the store
+			 	 */
 				try {
 					const response = { reminders: store.readFromStore() };
 					res.statusCode = 200;
@@ -100,6 +103,11 @@ const onRequest = (req, res) => {
 					res.end();
 				}
 			} else if (method === "POST") {
+				/**
+				 * Validate request and then
+				 * write the new reminder to the
+				 * store
+				 */
 				try {
 					let requestBody = [];
 					req
@@ -134,21 +142,36 @@ const onRequest = (req, res) => {
 					res.end();
 				}
 			} else if (method === "DELETE") {
+				/**
+				 * Validate request and then
+				 * delete or issue for delete
+				 * accordingly.
+				 */
 				try {
 					const query = url.split("?")[1];
 					const taskId = query.split("=")[1];
 					if (isUID(taskId)) {
-						store.deleteFromStore(taskId)
-							.then(() => {
-								res.setHeader("Content-Type", "application/json");
-								res.statusCode = 200;
-								res.end();
-							});
-					} else {
-						res.statusCode = 400;
-						res.write("Invalid Request");
-						res.end();
+						const currentStore = store.readFromStore();
+						if (currentStore[taskId] && currentStore[taskId].type === "timeout") {
+							return store.deleteFromStore(taskId)
+								.then(() => {
+									res.setHeader("Content-Type", "application/json");
+									res.statusCode = 200;
+									res.end();
+								});
+						} else if (currentStore[taskId] && currentStore[taskId].type === "interval") {
+							return store.issueForDelete(taskId)
+								.then(() => {
+									res.setHeader("Content-Type", "application/json");
+									res.statusCode = 200;
+									res.end();
+								});
+						}
 					}
+					res.statusCode = 400;
+					res.write("Invalid Request");
+					res.end();
+					return;
 				} catch (err) {
 					res.statusCode = 500;
 					res.write(`Internal Server Error: ${err}`);
@@ -169,7 +192,7 @@ const onRequest = (req, res) => {
 }
 
 /**
- * RemindMe Notifications server
+ * Runs a simple HTTP server
  * @description Starts an HTTP server on port 80.
  * 
  * Returns a Promise whose resolution value is the

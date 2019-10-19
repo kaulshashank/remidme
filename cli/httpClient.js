@@ -45,7 +45,11 @@ const deleteReminder = function (UID) {
 	return axios.delete(`/reminder?id=${UID}`)
 		.then(function (response) {
 			return response.data;
-		});
+		})
+		.catch(function(err) {
+			console.log(`Unable to delete reminder: ${UID}`);
+			console.log(`Please check if it exists using '--list' or '-l'`);
+		})
 }
 
 module.exports = {

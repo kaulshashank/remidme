@@ -64,7 +64,7 @@ describe("HTTP Client", function () {
 	it("Delete a reminder succesfully", function (done) {
 
 		nock(BASE_URL)
-			.delete("/reminder")
+			.delete(/\/reminder\?id=.*/)
 			.reply(200, "");
 
 		client.deleteReminder(TASK_ID)

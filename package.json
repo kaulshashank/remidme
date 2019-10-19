@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "mocha **/*.test.js --exit --colors"
+    "test:linux": "REMINDME_STORE_LOC=/home/shashankkaul/test.json PORT=3030 NODE_ENV=development mocha **/*.test.js --exit --colors",
+    "test:windows": "REMINDME_STORE_LOC=C:\\Users\\test.json PORT=3030 NODE_ENV=development mocha **/*.test.js --exit --colors"
   },
   "contributors": [
     "Shashank Kaul <kaulshashank96@gmail.com><shashank@klenty.com>",

@@ -100,7 +100,6 @@ const onRequest = (req, res) => {
 			try {
 				let requestBody = [];
 				req
-					.on("error", console.log)
 					.on("data", chunk => {
 						requestBody.push(chunk);
 					})
@@ -127,7 +126,6 @@ const onRequest = (req, res) => {
 			try {
 				let requestBody = [];
 				req
-					.on("error", console.log)
 					.on("data", chunk => {
 						requestBody.push(chunk);
 					})

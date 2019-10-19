@@ -7,20 +7,34 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "program": "${workspaceFolder}\\test.js",
-            "args": []
+            "name": "(Windows) Launch Server",
+            "program": "${workspaceFolder}\\startServer.js",
+            "env": {
+                "REMINDME_STORE_LOC": ""
+            }
         },
         {
             "type": "node",
             "request": "launch",
-            "name": "Run unit tests",
+            "name": "(Linux) Launch Server",
+            "program": "${workspaceFolder}/startServer.js",
+            "env": {
+                "REMINDME_STORE_LOC": "/home/shashankkaul/remindme_store.json"
+            }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "(Linux) Run unit tests",
             "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "env": {
+                "REMINDME_STORE_LOC": "/home/shashankkaul/remindme_store.json"
+            },
             "args": [
                 "**/*.test.js",
                 "--exit",
                 "--colors"
             ]
-        }
+        },
     ]
 }

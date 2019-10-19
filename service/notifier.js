@@ -4,12 +4,6 @@
  */
 const notifier = require('node-notifier');
 
-const reminderStore = {};
-
-const generateUID = () => {
-	return Math.floor(Math.random() * 1000);
-};
-
 const issueNotification = msg => {
 	return new Promise((resolve, reject) => {
 		if (!msg) {
@@ -17,11 +11,9 @@ const issueNotification = msg => {
 		} else {
 			notifier.notify(
 				{
-					title: 'Notification',
+					title: 'You have a reminder!',
 					message: msg,
-					// icon: path.join(__dirname, 'coulson.jpg'), // Absolute path (doesn't work on balloons)
-					sound: true, // Only Notification Center or Windows Toasters
-					wait: true // Wait with callback, until user action is taken against notification, does not apply to Windows Toasters as they always wait
+					sound: true
 				},
 				(err, response) => {
 					// Response is response from notification
@@ -37,34 +29,12 @@ const issueNotification = msg => {
 }
 
 const notify = notificationObject => {
-	return new Promise((resolve, reject) => {
-		if (typeof notificationObject === 'undefined'
-			|| Object.keys(notificationObject).length === 0) {
-			reject(new Error('No Notification Object Found!'))
-		} else {
-			if (notificationObject.type == "interval") {
-				const timeoutObject = setInterval(() => {
-					issueNotification(notificationObject.task)
-						.then(resolve)
-						.catch(reject);
-				}, notificationObject.time);
-
-				reminderStore[generateUID()] = timeoutObject;
-
-			} else if (notificationObject.type == "timeout") {
-				//timeoutID will be used to clear notifications
-				const timeoutObject = setTimeout(() => {
-					issueNotification(notificationObject.task)
-						.then(resolve)
-						.catch(reject);
-				}, notificationObject.time);
-
-				reminderStore[generateUID()] = timeoutObject;
-			} else {
-				reject(new Error('Notification Type undefined!'));
-			}
-		}
-	});
+	if (typeof notificationObject === 'undefined'
+		|| Object.keys(notificationObject).length === 0) {
+		Promise.reject(new Error('No Notification Object Found!'))
+	} else {
+		return issueNotification(notificationObject.task);
+	}
 }
 
 module.exports = notify;

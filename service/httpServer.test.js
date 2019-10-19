@@ -25,7 +25,7 @@ describe("HTTP Server", function () {
 	it("Create a reminder (POST /reminder)", function (done) {
 		chai.request(APP)
 			.post(`/reminder`)
-			.send({ task: "Drink water", type: "timeout", duration: MINUTE })
+			.send({ task: "Drink water", type: "timeout", time: MINUTE })
 			.then(function (res) {
 				expect(res).to.have.status(200);
 				expect(res.body).to.have.property("taskId").to.be.a("string");

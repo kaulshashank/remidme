@@ -14,7 +14,7 @@ describe('JSON Store', function () {
 		const fakeNotification = {
 			type: "timeout",
 			task: "Reminder",
-			duration: 69696969
+			time: 69696969
 		};
 		store.writeToStore(fakeNotification)
 			.then(function (UID) {

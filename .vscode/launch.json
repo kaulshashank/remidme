@@ -29,6 +29,24 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "(Linux) remindme",
+            "program": "${workspaceFolder}/remindme.js",
+            "args": [
+                "to",
+                "do",
+                "something",
+                "every",
+                "2",
+                "hours"
+            ],
+            "env": {
+                "REMINDME_STORE_LOC": "/home/shashankkaul/remindme_store.json",
+                "NODE_ENV": "development"
+            }
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "(Linux) Run unit tests",
             "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
             "env": {

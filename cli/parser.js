@@ -22,8 +22,8 @@ const MINUTE = 60 * SECOND;
 const HOUR = 60 * MINUTE;
 
 const HELP_MSG = `
-	Usage: 
-	
+	Correct Usage:
+
 	remindme to do <task name> in/after/every <duration> <duration unit>
 	remindme to <task name> in/after/every <duration> <duration unit>
 	remindme in/after/every <duration> <duration unit> to do <task name>
@@ -39,59 +39,130 @@ const HELP_MSG = `
 	"--purge": Removes all scheduled reminders.
 `; // @todo: Improve this message with examples.
 
-function getTimeInMS(argV, inOrAfterIndex) {
-	if (typeof inOrAfterIndex === 'undefined') return undefined;
+function isUID(uid) {
+	const segments = uid.split("-");
+	return (
+		segments.length === 4
+		&& segments[0] === "RME"
+		&& parseInt(segments[1]) >= 1000 && parseInt(segments[1]) <= 2000
+		&& parseInt(segments[2]) >= 2000 && parseInt(segments[2]) <= 3000
+		&& parseInt(segments[3]) >= 3000 && parseInt(segments[3]) <= 4000
+	);
+}
 
-	let msec = 0;
-	const time = Number(argV[inOrAfterIndex + 1]);
-	const timeUnit = argV[inOrAfterIndex + 2];
+function getTimeString(argV, type, inOrAfterOrEveryIndex) {
+	if (typeof inOrAfterOrEveryIndex === 'undefined') return undefined;
+
+
+	const time = Number(argV[inOrAfterOrEveryIndex + 1]);
+
+	let timeUnit;
+	if (type === "interval") {
+		if (!isNaN(time)) { // Plural unit
+			timeUnit = argV[inOrAfterOrEveryIndex + 2];
+		} else { // Singular unit
+			timeUnit = argV[inOrAfterOrEveryIndex + 1];
+		}
+	} else {
+		timeUnit = argV[inOrAfterOrEveryIndex + 2];
+	}
 
 	// NotANumber type validation. Should not proceed further if 
 	// the time field could not be parsed to a valid number by Number();
-	if (isNaN(time)) return undefined;
+	if (isNaN(time) && type !== "interval") return undefined;
 
-	switch (timeUnit) {
-		case 'hours':
-		case 'hour':
-			msec = time * HOUR;
-			break;
-		case 'minutes':
-		case 'minute':
-			msec = time * MINUTE;
-			break;
-		case 'seconds':
-		case 'second':
-			msec = time * SECOND;
-			break;
-		default: msec = undefined; break;
+	if (type === "timeout") {
+		let msec = 0;
+		switch (timeUnit) {
+			case 'hours':
+			case 'hour':
+				msec = time * HOUR;
+				break;
+			case 'minutes':
+			case 'minute':
+				msec = time * MINUTE;
+				break;
+			case 'seconds':
+			case 'second':
+				msec = time * SECOND;
+				break;
+			default: return undefined;
+		}
+
+		return new Date(new Date().valueOf() + msec);
+	} else if (type === "interval") {
+
+		switch (timeUnit) {
+			case 'hours':
+				return `* 1 */${time} * * *`; // every x(=time) hours
+			case 'hour':
+				return `1 1 * * * *`; // every hour
+
+			case 'minutes':
+				return `1 */${time} * * * *`; // every x(=time) minutes
+			case 'minute':
+				return `1 * * * * *`; // every minute
+
+			case 'seconds':
+				return `*/${time} * * * * *`; // 
+			case 'second':
+				return `* * * * * *`;
+			default: return undefined;
+		}
+
+	} else {
+		return undefined;
 	}
 
-	return msec;
 }
 
 function parse(argV) {
 	try {
-		const helpIndex = argV.findIndex(function (val) {
-			return ((val === "--help") || (val === "-h"));
-		});
+		const helpIndex = argV.findIndex(val => ((val === "--help") || (val === "-h")));
 
 		if (helpIndex !== -1) {
 			console.log(HELP_MSG);
-			process.exit(0); // exit with zero code for succesful execution
 			return;
 		}
 
+		const listIndex = argV.findIndex(val => ((val === "--list") || val === "-l"));
+
+		if (listIndex !== -1) {
+			return { isList: true, isPurge: false, deleteTask: undefined };
+		}
+
+		const deleteIndex = argV.findIndex(val => val === "--delete");
+
+		if (deleteIndex !== -1) {
+			const possibleUID = argV[deleteIndex + 1];
+			if (isUID(possibleUID)) {
+				return { isList: false, isPurge: false, deleteTask: possibleUID };
+			} else {
+				console.log("Please enter a valid id.");
+				return;
+			}
+		}
+
 		// Index for 'in' or 'after' keywords
-		const inOrAfterIndex = argV.findIndex(function (val) {
-			return (val === 'in' || val === 'after');
-		});
+		const inOrAfterIndex = argV.findIndex(val => (val === 'in' || val === 'after'));
+		const everyIndex = argV.findIndex(val => val === 'every');
+
+		// Set type on the basis of the presence of 'every' determiner
+		let type;
+		if (everyIndex === -1) {
+			type = 'timeout';
+		} else {
+			type = 'interval';
+		}
+
+		const time = getTimeString(
+			argV
+			, type
+			, inOrAfterIndex !== -1 ? inOrAfterIndex
+				: everyIndex !== -1 ? everyIndex : undefined);
 
 		// Index for 'to' keyword
-		const toIndex = argV.findIndex(function (val) {
-			return (val === 'to');
-		})
-
-		const time = getTimeInMS(argV, inOrAfterIndex);
+		const toIndex = argV.findIndex(val => (val === 'to'));
 
 		let task = undefined;
 		if (argV[toIndex + 1] === 'do') {
@@ -100,18 +171,9 @@ function parse(argV) {
 			task = argV[toIndex + 1];
 		}
 
-		if (inOrAfterIndex === -1 || typeof time === 'undefined' || typeof task === 'undefined') {
-			console.log('Incorrect usage.\n');
+		if (typeof type === 'undefined' || typeof time === 'undefined' || typeof task === 'undefined') {
 			console.log(HELP_MSG);
-			process.exit(1); // exit with non-zero code for runtime error
 			return;
-		}
-
-		// Set type on the basis of the presence of 'every' determiner
-		if (argV[inOrAfterIndex + 1] === 'every') {
-			type = 'interval';
-		} else {
-			type = 'timeout';
 		}
 
 		let isPurge = false; // @todo: Implement
@@ -121,10 +183,10 @@ function parse(argV) {
 
 		return taskObj;
 	} catch (err) {
-		console.log("Unexpected error");
+		console.log("Unexpected error.");
 		console.error(err);
-		process.exit(1); // exit with non-zero code for runtime error
+		return;
 	}
 }
 
-module.exports = parse;
+module.exports = { parser: parse, isUID };

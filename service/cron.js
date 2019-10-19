@@ -12,14 +12,18 @@ function run() {
 		const reminder = currentStore[uid];
 		switch (reminder.type) {
 			case "timeout": {
-				if (new Date(reminder.duration).valueOf() <= new Date().valueOf())
-					notify(reminder);
+				if (new Date(reminder.time).valueOf() <= new Date().valueOf()) {
+					notify(reminder)
+						.then(() => {
+							return store.deleteFromStore(uid);
+						});
+				}
 			}
 			case "interval": {
 				if (!memoryStoreForIntervalReminders[uid]) {
-					memoryStoreForIntervalReminders[reminder.uid] = true;
+					memoryStoreForIntervalReminders[uid] = true;
 					const cron = new CronJob({
-						cronTime: reminder.duration,
+						cronTime: reminder.time,
 						onTick: function () {
 							notify(reminder);
 						}
@@ -38,8 +42,6 @@ const CRON_CONFIGURATIONS = {
 };
 
 module.exports = async function () {
-	if (process.env.NODE_ENV !== "development") {
-		const cron = new CronJob(CRON_CONFIGURATIONS);
-		cron.start();
-	}
+	const cron = new CronJob(CRON_CONFIGURATIONS);
+	cron.start();
 }

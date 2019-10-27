@@ -1,10 +1,11 @@
 {
   "name": "remindme",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "mocha *.test.js --exit --colors"
+    "test:linux": "REMINDME_STORE_LOC=/home/shashankkaul/test.json PORT=3030 NODE_ENV=development mocha **/*.test.js --exit --colors",
+    "test:windows": "REMINDME_STORE_LOC=C:\\Users\\test.json PORT=3030 NODE_ENV=development mocha **/*.test.js --exit --colors"
   },
   "contributors": [
     "Shashank Kaul <kaulshashank96@gmail.com><shashank@klenty.com>",
@@ -13,10 +14,15 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "node-notifier": "^6.0.0"
+    "axios": "^0.19.0",
+    "cron": "^1.7.2",
+    "node-notifier": "^6.0.0",
+    "table": "^5.4.6"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^6.2.1"
+    "chai-http": "^4.3.0",
+    "mocha": "^6.2.1",
+    "nock": "^11.4.0"
   }
 }

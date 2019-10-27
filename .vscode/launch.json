@@ -7,20 +7,54 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "program": "${workspaceFolder}\\test.js",
-            "args": []
+            "name": "(Windows) Launch Server",
+            "program": "${workspaceFolder}\\startServer.js",
+            "env": {
+                "REMINDME_STORE_LOC": "",
+                "NODE_ENV": "development",
+                "PORT": "3000"
+            }
         },
         {
             "type": "node",
             "request": "launch",
-            "name": "Run unit tests",
-            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "name": "(Linux) Launch Server",
+            "program": "${workspaceFolder}/startServer.js",
+            "env": {
+                "REMINDME_STORE_LOC": "/home/shashankkaul/remindme_store.json",
+                "NODE_ENV": "development",
+                "PORT": "3000"
+            }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "(Linux) remindme",
+            "program": "${workspaceFolder}/remindme.js",
             "args": [
-                "*.test.js",
+                "--delete",
+                "RME-1430-2564-3578"
+            ],
+            "env": {
+                "REMINDME_STORE_LOC": "/home/shashankkaul/remindme_store.json",
+                "NODE_ENV": "development"
+            }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "(Linux) Run unit tests",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "env": {
+                "REMINDME_STORE_LOC": "/home/shashankkaul/test.json",
+                "PORT": "3030",
+                "NODE_ENV": "development"
+            },
+            "args": [
+                "**/*.test.js",
                 "--exit",
                 "--colors"
             ]
-        }
+        },
     ]
 }

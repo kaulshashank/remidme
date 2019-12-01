@@ -1,3 +1,5 @@
+#! /usr/bin/node
+
 const { table } = require("table");
 const { parser } = require("./cli/parser.js");
 const client = require("./cli/httpClient.js");
